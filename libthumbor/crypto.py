@@ -7,8 +7,12 @@
 # Licensed under the MIT license:
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 Bernardo Heynemann heynemann@gmail.com
+#
+# Adapted to Python3 − JT
 
-'''Encrypted URLs for thumbor encryption.'''
+"""
+Encrypted URLs for thumbor encryption.
+"""
 
 from __future__ import absolute_import
 
@@ -26,36 +30,40 @@ from libthumbor.url import url_for, unsafe_url, plain_image_url
 
 
 class CryptoURL(object):
-    '''Class responsible for generating encrypted URLs for thumbor'''
-
+    """
+    Class responsible for generating encrypted URLs for thumbor.
+    """
     def __init__(self, key):
-        '''Initializes the encryptor with the proper key'''
+        """
+        Initializes the encryptor with the proper key.
+        """
         if not PYCRYPTOFOUND:
             raise RuntimeError('pyCrypto could not be found,' +
                                ' please install it before using libthumbor')
-        if isinstance(key, unicode):
-            key = str(key)
+        if isinstance(key, str):
+            key = bytes(key, encoding='ascii')
         self.key = key
         self.computed_key = (key * 16)[:16]
 
     def generate_old(self, options):
         url = url_for(**options)
-
+        url = bytes(url, encoding='ascii')
         pad = lambda s: s + (16 - len(s) % 16) * "{"
         cypher = AES.new(self.computed_key)
         encrypted = base64.urlsafe_b64encode(cypher.encrypt(pad(url)))
-
-        return "/%s/%s" % (encrypted, options['image_url'])
+        return "/%s/%s" % (str(encrypted, encoding='utf-8'), options['image_url'])
 
     def generate_new(self, options):
         url = plain_image_url(**options)
-        signature = base64.urlsafe_b64encode(hmac.new(self.key, unicode(url).encode('utf-8'), hashlib.sha1).digest())
-
-        return '/%s/%s' % (signature, url)
+        signature = base64.urlsafe_b64encode(hmac.new(self.key,
+                                                      bytes(url, encoding='ascii'),
+                                                      hashlib.sha1).digest())
+        return '/%s/%s' % (str(signature, encoding='utf-8'), url)
 
     def generate(self, **options):
-        '''Generates an encrypted URL with the specified options'''
-
+        """
+        Generates an encrypted URL with the specified options.
+        """
         if options.get('unsafe', False):
             return unsafe_url(**options)
         else:

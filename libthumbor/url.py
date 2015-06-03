@@ -8,7 +8,9 @@
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 Bernardo Heynemann heynemann@gmail.com
 
-'''URL composer to create options-based URLs for thumbor encryption.'''
+"""
+URL composer to create options-based URLs for thumbor encryption.
+"""
 
 import hashlib
 
@@ -17,7 +19,9 @@ AVAILABLE_VALIGN = ['top', 'middle', 'bottom']
 
 
 def calculate_width_and_height(url_parts, options):
-    '''Appends width and height information to url'''
+    """
+    Appends width and height information to url.
+    """
     width = options.get('width', 0)
     has_width = width
     height = options.get('height', 0)
@@ -27,9 +31,9 @@ def calculate_width_and_height(url_parts, options):
     flop = options.get('flop', False)
 
     if flip:
-        width = width * -1
+        width *= -1
     if flop:
-        height = height * -1
+        height *= -1
 
     if not has_width and not has_height:
         if flip:
@@ -42,8 +46,9 @@ def calculate_width_and_height(url_parts, options):
 
 
 def url_for(**options):
-    '''Returns the url for the specified options'''
-
+    """
+    Returns the url for the specified options.
+    """
     url_parts = get_url_parts(**options)
     image_hash = hashlib.md5(options['image_url']).hexdigest()
     url_parts.append(image_hash)
@@ -52,15 +57,18 @@ def url_for(**options):
 
 
 def unsafe_url(**options):
-    '''Returns the unsafe url with the specified options'''
-
+    """
+    Returns the unsafe url with the specified options.
+    """
     return 'unsafe/%s' % plain_image_url(**options)
+
 
 def plain_image_url(**options):
     url_parts = get_url_parts(**options)
     url_parts.append(options['image_url'])
 
     return '/'.join(url_parts)
+
 
 def get_url_parts(**options):
     if 'image_url' not in options:
