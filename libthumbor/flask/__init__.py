@@ -1,2 +1,3 @@
 from libthumbor.flask.field import ThumborData, ThumborField
-__all__ = ('field')
+from libthumbor.flask.views import ThumborImageInput, ThumborImageField
+__all__ = ['field', 'views']
