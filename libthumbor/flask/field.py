@@ -5,8 +5,7 @@ from libthumbor.crypto import CryptoURL
 from flask.ext.mongoengine import *
 from flask import current_app
 
-with current_app.app_context():
-    crypto_url = CryptoURL(key=current_app.config['THUMBOR_SECURITY_KEY'])
+crypto_url = None
 
 class ThumborData(dict):
     """
@@ -26,6 +25,8 @@ class ThumborData(dict):
 
     def get_image(self, **kwargs):
         with current_app.app_context():
+            if crypto_url == None:
+                crypto_url = CryptoURL(key=current_app.config['THUMBOR_SECURITY_KEY'])
             if 'path' in self.keys():
                 return urljoin('{u.scheme}://{u.netloc}'.format(u=urlparse(current_app.config['THUMBOR_IMAGE_ENDPOINT'])),
                 crypto_url.generate(image_url='/'.join(self['path'].split('/')[2:]), **kwargs))
