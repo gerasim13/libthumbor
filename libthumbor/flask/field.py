@@ -15,17 +15,19 @@ class ThumborData(dict):
         self.update(kwargs)
 
     def __repr__(self):
-        if 'path' in self.keys():
-            return urljoin(current_app.config['THUMBOR_IMAGE_ENDPOINT'], self['path'])
+        with app.app_context():
+            if 'path' in self.keys():
+                return urljoin(current_app.config['THUMBOR_IMAGE_ENDPOINT'], self['path'])
         return ''
 
     def __str__(self):
         return self.__repr__()
 
     def get_image(self, **kwargs):
-        if 'path' in self.keys():
-            return urljoin('{u.scheme}://{u.netloc}'.format(u=urlparse(current_app.config['THUMBOR_IMAGE_ENDPOINT'])),
-                           crypto_url.generate(image_url='/'.join(self['path'].split('/')[2:]), **kwargs))
+        with app.app_context():
+            if 'path' in self.keys():
+                return urljoin('{u.scheme}://{u.netloc}'.format(u=urlparse(current_app.config['THUMBOR_IMAGE_ENDPOINT'])),
+                crypto_url.generate(image_url='/'.join(self['path'].split('/')[2:]), **kwargs))
         return ''
 
 class ThumborField(BaseField):
