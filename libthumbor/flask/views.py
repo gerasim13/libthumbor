@@ -91,29 +91,28 @@ if ADMIN_PRESENT:
                                             content_type=self.data.content_type,
                                             path=response.headers['location']))
 
-
-    def thumbor_image_formatter(view, value):
-        """
-        Represents content of the field as a thumbnail with link for list view.
-        """
-        if not value:
-            return ''
-
-        return Markup(
-            ('<div class="image-thumbnail">' +
-                '<a href="%(url)s" target="_blank"><img src="%(thumb)s"/></a>' +
-             '</div>') %
-            {
-                'url': str(value),
-                'thumb': value.get_image(height=28, width=36),
-            })
-
-    MY_FORMATTERS = dict(DEFAULT_FORMATTERS)
-    MY_FORMATTERS.update({ThumborData: thumbor_image_formatter})
-
 else:
     class ThumborImageInput(object):
         pass
 
     class ThumborImageField(object):
         pass
+
+def thumbor_image_formatter(view, value):
+    """
+    Represents content of the field as a thumbnail with link for list view.
+    """
+    if not value:
+        return ''
+
+    return Markup(
+        ('<div class="image-thumbnail">' +
+            '<a href="%(url)s" target="_blank"><img src="%(thumb)s"/></a>' +
+         '</div>') %
+        {
+            'url': str(value),
+            'thumb': value.get_image(height=28, width=36),
+        })
+
+MY_FORMATTERS = dict(DEFAULT_FORMATTERS) if ADMIN_PRESENT else dict()
+MY_FORMATTERS.update({ThumborData: thumbor_image_formatter})
