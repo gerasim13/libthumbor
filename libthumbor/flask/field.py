@@ -5,7 +5,8 @@ from libthumbor.crypto import CryptoURL
 from flask.ext.mongoengine import *
 from flask import current_app
 
-crypto_url = CryptoURL(key=current_app.config['THUMBOR_SECURITY_KEY'])
+with current_app.app_context():
+    crypto_url = CryptoURL(key=current_app.config['THUMBOR_SECURITY_KEY'])
 
 class ThumborData(dict):
     """
