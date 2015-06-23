@@ -40,7 +40,9 @@ if ADMIN_PRESENT:
                     'name': field.name,
                 }
 
-            del kwargs['class']
+            if 'class' in kwargs.keys():
+                del kwargs['class']
+                
             return HTMLString('{0}<input {1} onchange="previewFile(this)">'.format(
                 placeholder,
                 html_params(name=field.name, type='file', **kwargs))
