@@ -5,6 +5,8 @@ from libthumbor.flask import ThumborField
 try:
     from flask_admin.contrib.mongoengine.fields  import MongoImageField, is_empty
     from flask_admin.contrib.mongoengine.typefmt import DEFAULT_FORMATTERS
+    from werkzeug.datastructures import FileStorage
+    from wtforms.widgets import HTMLString, html_params
     from jinja2 import Markup
     import requests
     ADMIN_PRESENT = True
