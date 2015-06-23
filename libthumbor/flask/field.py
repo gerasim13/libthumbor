@@ -27,6 +27,7 @@ class ThumborData(dict):
 
     def get_image(self, **kwargs):
         with current_app.app_context():
+            global crypto_url
             if crypto_url == None:
                 crypto_url = CryptoURL(key=current_app.config['THUMBOR_SECURITY_KEY'])
             if 'path' in self.keys():
