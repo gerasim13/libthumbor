@@ -41,4 +41,5 @@ class ThumborField(BaseField):
         return
 
     def to_python(self, value):
-        return ThumborData({ 'path' : value })
+        dict = { 'path' : value }
+        return ThumborData(**dict)
