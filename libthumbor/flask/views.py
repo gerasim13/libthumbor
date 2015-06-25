@@ -3,7 +3,7 @@ from libthumbor.flask import ThumborData
 from libthumbor.flask import ThumborField
 
 try:
-    from flask_admin.contrib.mongoengine.fields  import MongoImageField, is_empty
+    from flask_admin.contrib.mongoengine.fields  import MongoFileField, is_empty
     from flask_admin.contrib.mongoengine.typefmt import DEFAULT_FORMATTERS
     from werkzeug.datastructures import FileStorage
     from wtforms.widgets import HTMLString, html_params
@@ -47,14 +47,8 @@ if ADMIN_PRESENT:
                 html_params(name=field.name, type='file', **kwargs))
             )
 
-    class ThumborImageField(MongoImageField):
+    class ThumborImageField(MongoFileField):
         widget = ThumborImageInput()
-
-        def get_image(self, **kwargs):
-            return self.object_data.get_image(**kwargs)
-
-        def get_endpoint(self):
-            return str(self.object_data)
 
         def populate_obj(self, obj, name):
             """
@@ -77,6 +71,12 @@ if ADMIN_PRESENT:
                 response = requests.post(current_app.config['THUMBOR_IMAGE_ENDPOINT'], media=self.data.read())
                 thumbdata = ThumborData(filename=self.data.filename, content_type=self.data.content_type, path=response.headers['location'])
                 setattr(obj, name, thumbdata)
+
+        def get_image(self, **kwargs):
+            return self.object_data.get_image(**kwargs)
+
+        def get_endpoint(self):
+            return str(self.object_data)
 
 else:
     class ThumborImageInput(object):
