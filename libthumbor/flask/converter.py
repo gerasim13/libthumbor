@@ -16,5 +16,5 @@ if ADMIN_PRESENT:
         def conv_ThumborField(self, model, field, kwargs):
             return ThumborImageField(**kwargs)
 else:
-    class BackendModelConverter(CustomModelConverter):
+    class BackendModelConverter(object):
         pass
