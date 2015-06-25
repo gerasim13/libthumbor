@@ -60,24 +60,23 @@ if ADMIN_PRESENT:
             """
             Manipulates data through Thumbor REST API.
             """
+            field = getattr(obj, name, None)
+            if field is not None:
+                # Delete imgae before uploading
+                self.delete_img()
+                if isinstance(self.data, FileStorage) and not is_empty(self.data.stream) and not self._should_delete:
+                    self.upload_img()
+
+        def delete_img(self):
+            url = self.get_endpoint()
+            requests.delete(url)
+            setattr(obj, name, None)
+
+        def upload_img(self):
             with current_app.app_context():
-                field = getattr(obj, name, None)
-                if self._should_delete:
-                    # delete
-                    if field is not None:
-                        url = self.get_endpoint()
-                        requests.delete(url)
-                        setattr(obj, name, None)
-                    return
-                if isinstance(self.data, FileStorage) and not is_empty(self.data.stream):
-                    if field:
-                        # delete
-                        url = self.get_endpoint()
-                        requests.delete(url)
-                    # create
-                    response = requests.post(current_app.config['THUMBOR_IMAGE_ENDPOINT'], media=self.data.read())
-                    thumbdata = ThumborData(filename=self.data.filename, content_type=self.data.content_type, path=response.headers['location'])
-                    setattr(obj, name, thumbdata)
+                response = requests.post(current_app.config['THUMBOR_IMAGE_ENDPOINT'], media=self.data.read())
+                thumbdata = ThumborData(filename=self.data.filename, content_type=self.data.content_type, path=response.headers['location'])
+                setattr(obj, name, thumbdata)
 
 else:
     class ThumborImageInput(object):
