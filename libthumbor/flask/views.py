@@ -58,7 +58,6 @@ if ADMIN_PRESENT:
             if field is not None:
                 # Delete imgae before uploading
                 self.delete_img()
-                raise
                 if isinstance(self.data, FileStorage) and not is_empty(self.data.stream) and not self._should_delete:
                     self.upload_img()
 
