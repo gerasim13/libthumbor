@@ -18,10 +18,9 @@ if ADMIN_PRESENT:
         """
         Renders a file input chooser field.
         """
-        template = ("""    <div class="%(name)s-thumbnail">
-          <img src="%(thumb)s" />
-          <span><input type="checkbox" name="%(marker)s">&nbsp;Удалить</span>
-          <a href="#" onclick="cancelFile($('#%(name)s'), '%(thumb)s')" style="display:none">Отменить загрузку</a>
+        template = ("""<div class="%(name)s-thumbnail"><img src="%(thumb)s" />
+            <span><input type="checkbox" name="%(marker)s">&nbsp;Удалить</span>
+            <a href="#" onclick="cancelFile($('#%(name)s'), '%(thumb)s')" style="display:none">Отменить загрузку</a>
         </div>""")
 
         def __call__(self, field, **kwargs):
@@ -37,12 +36,12 @@ if ADMIN_PRESENT:
                 placeholder = self.template % {
                     'thumb': field.get_image(width=80, height=64),
                     'marker': '_{0}-delete'.format(field.name),
-                    'name': field.name,
+                    'name': field.name
                 }
 
             if 'class' in kwargs.keys():
                 del kwargs['class']
-                
+
             return HTMLString('{0}<input {1} onchange="previewFile(this)">'.format(
                 placeholder,
                 html_params(name=field.name, type='file', **kwargs))
@@ -72,28 +71,14 @@ if ADMIN_PRESENT:
 
             if isinstance(self.data, FileStorage) and not is_empty(self.data.stream):
                 with current_app.app_context():
-                    if field is None:
-                        # create
-                        response = requests.post(current_app.config['THUMBOR_IMAGE_ENDPOINT'],
-                                                 data=self.data.read(),
-                                                 headers={'Content-type': self.data.content_type})
-                        setattr(obj,
-                                name,
-                                ThumborData(filename=self.data.filename,
-                                            content_type=self.data.content_type,
-                                            path=response.headers['location']))
-                    else:
-                        # update (delete, then create)
+                    if field:
+                        # delete
                         url = self.get_endpoint()
                         requests.delete(url)
-                        response = requests.post(current_app.config['THUMBOR_IMAGE_ENDPOINT'],
-                                                 data=self.data.read(),
-                                                 headers={'Content-type': self.data.content_type})
-                        setattr(obj,
-                                name,
-                                ThumborData(filename=self.data.filename,
-                                            content_type=self.data.content_type,
-                                            path=response.headers['location']))
+                    # create
+                    response = requests.post(current_app.config['THUMBOR_IMAGE_ENDPOINT'], media=self.data.read(), headers={'Content-type': self.data.content_type})
+                    thumbdata = ThumborData(filename=self.data.filename, content_type=self.data.content_type, path=response.headers['location'])
+                    setattr(obj, name, thumbdata)
 
 else:
     class ThumborImageInput(object):
