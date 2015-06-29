@@ -56,17 +56,17 @@ if ADMIN_PRESENT:
             """
             field = getattr(obj, name, None)
             if field is not None:
-                # Delete imgae before uploading
-                self.delete_img()
-                if isinstance(self.data, FileStorage) and not is_empty(self.data.stream) and not self._should_delete:
-                    self.upload_img()
+                # Delete image before uploading
+                self.delete_img(obj, name)
+            if isinstance(self.data, FileStorage) and not is_empty(self.data.stream) and not self._should_delete:
+                    self.upload_img(obj, name)
 
-        def delete_img(self):
+        def delete_img(self, obj, name):
             url = self.get_endpoint()
             requests.delete(url)
             setattr(obj, name, None)
 
-        def upload_img(self):
+        def upload_img(self, obj, name):
             with current_app.app_context():
                 response = requests.post(current_app.config['THUMBOR_IMAGE_ENDPOINT'], media=self.data.read())
                 thumbdata = ThumborData(filename=self.data.filename, content_type=self.data.content_type, path=response.headers['location'])
