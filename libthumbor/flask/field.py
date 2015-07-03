@@ -29,10 +29,6 @@ class ThumborData(dict):
             if crypto_url == None:
                 crypto_url = CryptoURL(key=current_app.config['THUMBOR_SECURITY_KEY'])
             if 'path' in self.keys():
-                #if kwargs:
-                #    import ipdb; ipdb.set_trace()
-                #_cr = crypto_url.generate(image_url='/'.join(self['path'].split('/')[2:]), **kwargs)
-                #_image_url = '/'.join(self['path'].split('/')[2:])
                 _url = urljoin('{u.scheme}://{u.netloc}'.format(u=urlparse(current_app.config['THUMBOR_IMAGE_ENDPOINT'])), crypto_url.generate(image_url='/'.join(self['path'].split('/')[2:]), **kwargs))
                 return _url
         return ''
