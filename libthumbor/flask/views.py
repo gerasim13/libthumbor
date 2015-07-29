@@ -69,24 +69,12 @@ if ADMIN_PRESENT:
             setattr(obj, name, None)
 
         def upload_img(self, obj, name):
-            with tempfile.TemporaryFile() as tmp_file, current_app.app_context():
-                tmp_file.write(self.data.read())
-                tmp_file.seek(0)
-                storage   = FileStorage(stream = tmp_file, filename=secure_filename('image.jpg'))
-                endpoint  = current_app.config['THUMBOR_IMAGE_ENDPOINT']
-                files     = { 'media': storage }
-                response  = requests.post(endpoint, files=files)
+            # Upload to thumbor server
+            with current_app.app_context():
+                files     = { 'media': self.data }
+                response  = requests.post(current_app.config['THUMBOR_IMAGE_ENDPOINT'], files=files)
                 thumbdata = ThumborData(filename=self.data.filename, content_type=self.data.content_type, path=response.headers['location'])
                 setattr(obj, name, thumbdata)
-
-            # with tempfile.TemporaryFile() as tmp, current_app.app_context():
-            #     self.data.save(tmp)
-            #     # Upload to thumbor server
-            #     with open(tmp, 'rb') as tmp_file:
-            #         files = { 'media': self.data }
-            #         response = requests.post(current_app.config['THUMBOR_IMAGE_ENDPOINT'], files=files)
-            #         thumbdata = ThumborData(filename=self.data.filename, content_type=self.data.content_type, path=response.headers['location'])
-            #         setattr(obj, name, thumbdata)
 
         def get_image(self, **kwargs):
             return self.object_data.get_image(**kwargs)
