@@ -102,7 +102,7 @@ def thumbor_image_formatter(view, value):
          '</div>') %
         {
             'url': str(value),
-            'thumb': value.get_image(height=48, width=48),
+            'thumb': value.get_image(height=80, width=64),
         })
 
 MY_FORMATTERS = dict(DEFAULT_FORMATTERS) if ADMIN_PRESENT else dict()

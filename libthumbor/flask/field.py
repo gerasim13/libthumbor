@@ -17,7 +17,7 @@ class ThumborData(dict):
     def __repr__(self):
         with current_app.app_context():
             if 'path' in self.keys():
-                return urljoin(current_app.config['THUMBOR_IMAGE_ENDPOINT'], self['path'])
+                return urljoin(current_app.config['THUMBOR_HOST'], self['path'])
         return ''
 
     def __str__(self):
@@ -29,7 +29,7 @@ class ThumborData(dict):
             if crypto_url == None:
                 crypto_url = CryptoURL(key=current_app.config['THUMBOR_SECURITY_KEY'])
             if 'path' in self.keys():
-                _url = urljoin('{u.scheme}://{u.netloc}'.format(u=urlparse(current_app.config['THUMBOR_IMAGE_ENDPOINT'])), crypto_url.generate(image_url='/'.join(self['path'].split('/')[2:]), **kwargs))
+                _url = urljoin('{u.scheme}://{u.netloc}'.format(u=urlparse(current_app.config['THUMBOR_HOST'])), crypto_url.generate(image_url='/'.join(self['path'].split('/')[2:]), **kwargs))
                 return _url
         return ''
 
