@@ -73,6 +73,7 @@ if ADMIN_PRESENT:
                 tmp_file.write(self.data.read())
                 tmp_file.seek(0)
                 storage   = FileStorage(stream = tmp_file, filename=secure_filename('image.jpg'))
+                endpoint  = current_app.config['THUMBOR_IMAGE_ENDPOINT']
                 files     = { 'media': storage }
                 response  = requests.post(endpoint, files=files)
                 thumbdata = ThumborData(filename=self.data.filename, content_type=self.data.content_type, path=response.headers['location'])
