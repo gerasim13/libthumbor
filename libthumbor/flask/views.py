@@ -5,8 +5,9 @@ from libthumbor.flask import ThumborField
 try:
     from flask_admin.contrib.mongoengine.fields  import MongoFileField, is_empty
     from flask_admin.contrib.mongoengine.typefmt import DEFAULT_FORMATTERS
-    from werkzeug.datastructures import FileStorage
     from wtforms.widgets import HTMLString, html_params
+    from werkzeug.datastructures import FileStorage
+    from werkzeug import secure_filename
     from jinja2 import Markup
     import requests
     ADMIN_PRESENT = True
@@ -68,7 +69,7 @@ if ADMIN_PRESENT:
 
         def upload_img(self, obj, name):
             with current_app.app_context():
-                files = { 'media': self.data }
+                files = { 'media': secure_filename(self.data.filename) }
                 response = requests.post(current_app.config['THUMBOR_IMAGE_ENDPOINT'], files=files)
                 thumbdata = ThumborData(filename=self.data.filename, content_type=self.data.content_type, path=response.headers['location'])
                 setattr(obj, name, thumbdata)
