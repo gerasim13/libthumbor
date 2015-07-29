@@ -73,8 +73,7 @@ if ADMIN_PRESENT:
             with current_app.app_context():
                 files     = { 'media': self.data }
                 response  = requests.post(current_app.config['THUMBOR_IMAGE_ENDPOINT'], files=files)
-                thumbdata = ThumborData(filename=self.data.filename, content_type=self.data.content_type, path=response.headers['location'])
-                setattr(obj, name, thumbdata)
+                setattr(obj, name, response.headers['location'])
 
         def get_image(self, **kwargs):
             return self.object_data.get_image(**kwargs)
