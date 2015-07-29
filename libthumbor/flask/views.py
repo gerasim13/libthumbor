@@ -68,7 +68,7 @@ if ADMIN_PRESENT:
 
         def upload_img(self, obj, name):
             with current_app.app_context():
-                response = requests.post(current_app.config['THUMBOR_IMAGE_ENDPOINT'], data=self.data.read())
+                response = requests.post(current_app.config['THUMBOR_IMAGE_ENDPOINT'], media=self.data.read())
                 thumbdata = ThumborData(filename=self.data.filename, content_type=self.data.content_type, path=response.headers['location'])
                 setattr(obj, name, thumbdata)
 
