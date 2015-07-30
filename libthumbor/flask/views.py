@@ -13,6 +13,7 @@ try:
 
     from flask_admin.contrib.mongoengine.fields  import MongoFileField
     from flask_admin.contrib.mongoengine.typefmt import DEFAULT_FORMATTERS
+    from werkzeug.datastructures                 import FileStorage
 
     class ThumborImageInput(object):
         """
@@ -57,7 +58,7 @@ try:
             field = getattr(obj, name, None)
             if field is not None:
                 self.delete_img(obj, name)
-            if not self._should_delete:
+            if not self._should_delete and isinstance(obj, FileStorage) and not is_empty(obj.stream):
                 self.upload_img(obj, name)
 
         def delete_img(self, obj, name):
