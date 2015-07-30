@@ -27,9 +27,9 @@ try:
         </div>""")
 
         def __call__(self, field, **kwargs):
-            """
-            Renders form widget.
-            """
+            # """
+            # Renders form widget.
+            # """
             # kwargs.setdefault('id', field.id)
             # placeholder = """
             # <div class="{0}-thumbnail">
@@ -50,8 +50,7 @@ try:
             #     placeholder,
             #     html_params(name=field.name, type='file', **kwargs))
             # )
-
-            return ''
+            return HTMLString('')
 
     class ThumborImageField(MongoFileField):
         widget = ThumborImageInput()
