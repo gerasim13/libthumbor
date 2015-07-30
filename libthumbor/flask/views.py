@@ -62,8 +62,9 @@ try:
                 self.upload_img(obj, name)
 
         def delete_img(self, obj, name):
-            self.object_data.delete()
-            setattr(obj, name, None)
+            if isinstance(self.object_data, ThumborData):
+                self.object_data.delete()
+                setattr(obj, name, None)
 
         def upload_img(self, obj, name):
             if isinstance(self.data, FileStorage) and not is_empty(self.data.stream):
@@ -71,7 +72,9 @@ try:
                 setattr(obj, name, data)
 
         def get_image(self, **kwargs):
-            return self.object_data.image(**kwargs)
+            if isinstance(self.object_data, ThumborData):
+                return self.object_data.image(**kwargs)
+            return ''
 
     def thumbor_image_formatter(view, value):
         """
