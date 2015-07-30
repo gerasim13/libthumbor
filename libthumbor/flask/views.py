@@ -30,12 +30,12 @@ try:
             """
             Renders form widget.
             """
-            kwargs.setdefault('id', field.id)
+            # kwargs.setdefault('id', field.id)
             # placeholder = """
             # <div class="{0}-thumbnail">
             #     <img /><a href="#" onclick="cancelFile($('#{0}'), '')" style="display:none">Отменить загрузку</a>
             # </div>""".format(field.name)
-            # 
+            #
             # if field.object_data:
             #     placeholder = self.template % {
             #         'thumb': field.get_image(width=80, height=64),
