@@ -1,20 +1,19 @@
-from flask  import current_app
-from jinja2 import Markup
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+from .field import ThumborField
+from .field import ThumborData
 
-from libthumbor.flask  import ThumborField
-from libthumbor.flask  import ThumborData
-from libthumbor.crypto import CryptoURL
+THUMBOR_FORMATTERS = dict()
 
 try:
+    from flask             import current_app
+    from wtforms.widgets   import HTMLString, html_params
+    from jinja2            import Markup
+    from libthumbor.crypto import CryptoURL
+
     from flask_admin.contrib.mongoengine.fields  import MongoFileField
     from flask_admin.contrib.mongoengine.typefmt import DEFAULT_FORMATTERS
-    from wtforms.widgets                         import HTMLString, html_params
 
-    ADMIN_PRESENT = True
-except ImportError:
-    ADMIN_PRESENT = False
-
-if ADMIN_PRESENT:
     class ThumborImageInput(object):
         """
         Renders a file input chooser field.
@@ -72,28 +71,28 @@ if ADMIN_PRESENT:
         def get_image(self, **kwargs):
             return self.object_data.image(**kwargs)
 
-else:
+    def thumbor_image_formatter(view, value):
+        """
+        Represents content of the field as a thumbnail with link for list view.
+        """
+        if not value:
+            return ''
+
+        return Markup(
+            ('<div class="image-thumbnail">' +
+                '<a href="%(url)s" target="_blank"><img src="%(thumb)s"/></a>' +
+             '</div>') %
+            {
+                'url': str(value),
+                'thumb': value.get_image(height=80, width=64),
+            })
+
+    THUMBOR_FORMATTERS.update(DEFAULT_FORMATTERS)
+    THUMBOR_FORMATTERS.update({ThumborData: thumbor_image_formatter})
+
+except ImportError:
     class ThumborImageInput(object):
         pass
 
     class ThumborImageField(object):
         pass
-
-def thumbor_image_formatter(view, value):
-    """
-    Represents content of the field as a thumbnail with link for list view.
-    """
-    if not value:
-        return ''
-
-    return Markup(
-        ('<div class="image-thumbnail">' +
-            '<a href="%(url)s" target="_blank"><img src="%(thumb)s"/></a>' +
-         '</div>') %
-        {
-            'url': str(value),
-            'thumb': value.get_image(height=80, width=64),
-        })
-
-THUMBOR_FORMATTERS = dict(DEFAULT_FORMATTERS) if ADMIN_PRESENT else dict()
-THUMBOR_FORMATTERS.update({ThumborData: thumbor_image_formatter})

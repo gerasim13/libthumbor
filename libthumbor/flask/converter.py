@@ -1,4 +1,6 @@
-from libthumbor.flask import ThumborImageField
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+from .views import ThumborImageField
 
 try:
     from flask_admin.contrib.mongoengine.form import CustomModelConverter

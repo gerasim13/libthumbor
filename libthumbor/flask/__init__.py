@@ -1,5 +1,7 @@
-from libthumbor.flask.converter import BackendModelConverter
-from libthumbor.flask.field     import ThumborField, ThumborData
-from libthumbor.flask.views     import ThumborImageInput, ThumborImageField
-from libthumbor.flask.views     import THUMBOR_FORMATTERS
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+from .converter import BackendModelConverter
+from .field     import ThumborField, ThumborData
+from .views     import ThumborImageInput, ThumborImageField
+from .views     import THUMBOR_FORMATTERS
 __all__ = ['field', 'views', 'converter']
