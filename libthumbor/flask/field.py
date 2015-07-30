@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from werkzeug.datastructures import FileStorage
 from urllib.parse            import urlparse, urljoin
-from types                   import NoneType
 from flask                   import current_app
 from mongoengine.base        import BaseField
 from libthumbor.crypto       import CryptoURL
@@ -44,7 +43,7 @@ class ThumborData(str):
 
 class ThumborField(BaseField):
     def validate(self, value):
-        if not isinstance(value, (NoneType, ThumborData, str, list)):
+        if not isinstance(value, (type(None), ThumborData, str, list)):
             self.error('{0} is not a valid Thumbor data'.format(value))
         return
 
