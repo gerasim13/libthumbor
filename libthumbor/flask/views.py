@@ -58,7 +58,7 @@ try:
             field = getattr(obj, name, None)
             if field is not None:
                 self.delete_img(obj, name)
-            if not self._should_delete and isinstance(obj, FileStorage) and not is_empty(obj.stream):
+            if not self._should_delete:
                 self.upload_img(obj, name)
 
         def delete_img(self, obj, name):
@@ -66,8 +66,9 @@ try:
             setattr(obj, name, None)
 
         def upload_img(self, obj, name):
-            data = ThumborData(data=self.data)
-            setattr(obj, name, data)
+            if isinstance(self.data, FileStorage) and not is_empty(self.data.stream):
+                data = ThumborData(data=self.data)
+                setattr(obj, name, data)
 
         def get_image(self, **kwargs):
             return self.object_data.image(**kwargs)
