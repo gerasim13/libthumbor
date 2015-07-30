@@ -46,7 +46,7 @@ try:
 
     class ThumborField(BaseField):
         def validate(self, value):
-            if not isinstance(value, str) or (value is None):
+            if (not isinstance(value, str)) or (not isinstance(value, list)) or (value is None):
                 self.error('{0} is not a valid Thumbor data'.format(value))
             return
 
