@@ -8,8 +8,9 @@ import requests
 import tempfile
 
 try:
-    from flask_admin.contrib.mongoengine.fields import MongoFileField
-    from wtforms.widgets                        import HTMLString, html_params
+    from flask_admin.contrib.mongoengine.fields  import MongoFileField
+    from flask_admin.contrib.mongoengine.typefmt import DEFAULT_FORMATTERS
+    from wtforms.widgets                         import HTMLString, html_params
     ADMIN_PRESENT = True
 except ImportError:
     ADMIN_PRESENT = False
