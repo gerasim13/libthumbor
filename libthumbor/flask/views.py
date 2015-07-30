@@ -1,6 +1,12 @@
-from flask import current_app
-from libthumbor.flask import ThumborData
+from flask  import current_app
+from jinja2 import Markup
 from libthumbor.flask import ThumborField
+
+import requests
+import tempfile
+
+ADMIN_PRESENT = False
+crypto_url    = None
 
 try:
     from flask_admin.contrib.mongoengine.fields  import MongoFileField, is_empty
@@ -8,12 +14,10 @@ try:
     from wtforms.widgets import HTMLString, html_params
     from werkzeug.datastructures import FileStorage
     from werkzeug import secure_filename
-    from jinja2 import Markup
-    import requests
-    import tempfile
+
     ADMIN_PRESENT = True
 except ImportError:
-    ADMIN_PRESENT = False
+    pass
 
 if ADMIN_PRESENT:
     class ThumborImageInput(object):
@@ -64,22 +68,27 @@ if ADMIN_PRESENT:
                     self.upload_img(obj, name)
 
         def delete_img(self, obj, name):
-            url = self.get_endpoint()
-            requests.delete(url)
+            if len(self.object_data) > 0:
+                with current_app.app_context():
+                    url = urljoin(current_app.config['THUMBOR_HOST'], self.object_data)
+                    requests.delete(url)
             setattr(obj, name, None)
 
         def upload_img(self, obj, name):
-            # Upload to thumbor server
             with current_app.app_context():
                 files     = { 'media': self.data }
                 response  = requests.post(current_app.config['THUMBOR_IMAGE_ENDPOINT'], files=files)
                 setattr(obj, name, response.headers['location'])
 
         def get_image(self, **kwargs):
-            return self.object_data.get_image(**kwargs)
-
-        def get_endpoint(self):
-            return str(self.object_data)
+            with current_app.app_context():
+                global crypto_url
+                if crypto_url == None:
+                    crypto_url = CryptoURL(key=current_app.config['THUMBOR_SECURITY_KEY'])
+                if len(self.object_data) > 0:
+                    _url = urljoin('{u.scheme}://{u.netloc}'.format(u=urlparse(current_app.config['THUMBOR_HOST'])), crypto_url.generate(image_url='/'.join(self.object_data.split('/')[2:]), **kwargs))
+                    return _url
+            return ''
 
 else:
     class ThumborImageInput(object):
