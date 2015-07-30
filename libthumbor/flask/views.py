@@ -1,8 +1,5 @@
 from flask  import current_app
 from jinja2 import Markup
-from libthumbor.flask  import ThumborField
-from libthumbor.flask  import ThumborData
-from libthumbor.crypto import CryptoURL
 
 import requests
 import tempfile
@@ -11,6 +8,11 @@ try:
     from flask_admin.contrib.mongoengine.fields  import MongoFileField
     from flask_admin.contrib.mongoengine.typefmt import DEFAULT_FORMATTERS
     from wtforms.widgets                         import HTMLString, html_params
+
+    from libthumbor.flask.field import ThumborField
+    from libthumbor.flask.field import ThumborData
+    from libthumbor.crypto      import CryptoURL
+
     ADMIN_PRESENT = True
 except ImportError:
     ADMIN_PRESENT = False
