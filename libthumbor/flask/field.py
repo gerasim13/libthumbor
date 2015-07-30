@@ -6,6 +6,7 @@ from libthumbor.crypto import CryptoURL
 try:
     from werkzeug.datastructures import FileStorage
     from urllib.parse            import urlparse, urljoin
+    from types                   import NoneType
     from flask                   import current_app
     from flask.ext.mongoengine   import *
     from mongoengine             import *
