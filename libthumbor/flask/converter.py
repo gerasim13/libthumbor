@@ -1,7 +1,8 @@
+from libthumbor.flask import ThumborImageField
+
 try:
     from flask_admin.contrib.mongoengine.form import CustomModelConverter
     from flask_mongoengine.wtf                import orm
-    from libthumbor.flask.field               import ThumborImageField
 
     class BackendModelConverter(CustomModelConverter):
         """

@@ -6,6 +6,7 @@ from urllib.parse import urlparse, urljoin
 from libthumbor.crypto import CryptoURL
 from werkzeug.datastructures import FileStorage
 from flask_admin.contrib.mongoengine.fields import is_empty
+import requests
 
 crypto_url = None
 
