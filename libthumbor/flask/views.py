@@ -84,7 +84,7 @@ try:
              '</div>') %
             {
                 'url': str(value),
-                'thumb': value.get_image(height=80, width=64),
+                'thumb': value.image(height=80, width=64),
             })
 
     THUMBOR_FORMATTERS.update(DEFAULT_FORMATTERS)
