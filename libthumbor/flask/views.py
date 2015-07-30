@@ -11,7 +11,7 @@ try:
     from jinja2            import Markup
     from libthumbor.crypto import CryptoURL
 
-    from flask_admin.contrib.mongoengine.fields  import MongoFileField
+    from flask_admin.contrib.mongoengine.fields  import MongoFileField, is_empty
     from flask_admin.contrib.mongoengine.typefmt import DEFAULT_FORMATTERS
     from werkzeug.datastructures                 import FileStorage
 
