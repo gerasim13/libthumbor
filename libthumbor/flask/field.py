@@ -1,13 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from mongoengine.base  import BaseField
+from libthumbor.crypto import CryptoURL
+
 try:
+    from werkzeug.datastructures import FileStorage
+    from urllib.parse            import urlparse, urljoin
     from flask                   import current_app
     from flask.ext.mongoengine   import *
     from mongoengine             import *
-    from mongoengine.base        import BaseField
-    from werkzeug.datastructures import FileStorage
-    from urllib.parse            import urlparse, urljoin
-    from libthumbor.crypto       import CryptoURL
 
     from flask_admin.contrib.mongoengine.fields import is_empty
     import requests
@@ -56,5 +57,5 @@ except ImportError:
     class ThumborData(str):
         pass
 
-    class ThumborField(object):
+    class ThumborField(BaseField):
         pass

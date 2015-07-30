@@ -9,10 +9,8 @@
 # Copyright (c) 2011 Bernardo Heynemann heynemann@gmail.com
 
 '''libthumbor cryptography tests'''
-from unittest import TestCase
-
-from thumbor.crypto import Cryptor
-
+from unittest          import TestCase
+from thumbor.crypto    import Cryptor
 from libthumbor.crypto import CryptoURL
 
 IMAGE_URL = 'my.server.com/some/path/to/image.jpg'
