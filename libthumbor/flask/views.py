@@ -1,22 +1,18 @@
 from flask  import current_app
 from jinja2 import Markup
-from libthumbor.flask import ThumborField
+from libthumbor.flask  import ThumborField
+from libthumbor.flask  import ThumborData
+from libthumbor.crypto import CryptoURL
 
 import requests
 import tempfile
 
-ADMIN_PRESENT = False
-crypto_url    = None
-
 try:
-    from flask_admin.contrib.mongoengine.fields import MongoFileField, is_empty
-    from wtforms.widgets import HTMLString, html_params
-    from werkzeug.datastructures import FileStorage
-    from werkzeug import secure_filename
-
+    from flask_admin.contrib.mongoengine.fields import MongoFileField
+    from wtforms.widgets                        import HTMLString, html_params
     ADMIN_PRESENT = True
 except ImportError:
-    pass
+    ADMIN_PRESENT = False
 
 if ADMIN_PRESENT:
     class ThumborImageInput(object):
@@ -61,33 +57,20 @@ if ADMIN_PRESENT:
             """
             field = getattr(obj, name, None)
             if field is not None:
-                # Delete image before uploading
                 self.delete_img(obj, name)
-            if isinstance(self.data, FileStorage) and not is_empty(self.data.stream) and not self._should_delete:
-                    self.upload_img(obj, name)
+            if not self._should_delete:
+                self.upload_img(obj, name)
 
         def delete_img(self, obj, name):
-            if len(self.object_data) > 0:
-                with current_app.app_context():
-                    url = urljoin(current_app.config['THUMBOR_HOST'], self.object_data)
-                    requests.delete(url)
+            self.object_data.delete()
             setattr(obj, name, None)
 
         def upload_img(self, obj, name):
-            with current_app.app_context():
-                files     = { 'media': self.data }
-                response  = requests.post(current_app.config['THUMBOR_IMAGE_ENDPOINT'], files=files)
-                setattr(obj, name, response.headers['location'])
+            data = ThumborData(data=self.data)
+            setattr(obj, name, data)
 
         def get_image(self, **kwargs):
-            with current_app.app_context():
-                global crypto_url
-                if crypto_url == None:
-                    crypto_url = CryptoURL(key=current_app.config['THUMBOR_SECURITY_KEY'])
-                if len(self.object_data) > 0:
-                    _url = urljoin('{u.scheme}://{u.netloc}'.format(u=urlparse(current_app.config['THUMBOR_HOST'])), crypto_url.generate(image_url='/'.join(self.object_data.split('/')[2:]), **kwargs))
-                    return _url
-            return ''
+            return self.object_data.image(**kwargs)
 
 else:
     class ThumborImageInput(object):
@@ -111,3 +94,6 @@ def thumbor_image_formatter(view, value):
             'url': str(value),
             'thumb': value.get_image(height=80, width=64),
         })
+
+THUMBOR_FORMATTERS = dict(DEFAULT_FORMATTERS) if ADMIN_PRESENT else dict()
+THUMBOR_FORMATTERS.update({ThumborData: thumbor_image_formatter})
