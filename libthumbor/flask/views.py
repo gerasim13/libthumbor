@@ -9,8 +9,7 @@ ADMIN_PRESENT = False
 crypto_url    = None
 
 try:
-    from flask_admin.contrib.mongoengine.fields  import MongoFileField, is_empty
-    from flask_admin.contrib.mongoengine.typefmt import DEFAULT_FORMATTERS
+    from flask_admin.contrib.mongoengine.fields import MongoFileField, is_empty
     from wtforms.widgets import HTMLString, html_params
     from werkzeug.datastructures import FileStorage
     from werkzeug import secure_filename
@@ -112,6 +111,3 @@ def thumbor_image_formatter(view, value):
             'url': str(value),
             'thumb': value.get_image(height=80, width=64),
         })
-
-MY_FORMATTERS = dict(DEFAULT_FORMATTERS) if ADMIN_PRESENT else dict()
-MY_FORMATTERS.update({ThumborData: thumbor_image_formatter})
