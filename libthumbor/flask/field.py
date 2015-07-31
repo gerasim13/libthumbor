@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 from werkzeug.datastructures import FileStorage
 from urllib.parse            import urlparse, urljoin
 from flask                   import current_app

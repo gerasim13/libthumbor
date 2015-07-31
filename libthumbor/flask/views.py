@@ -1,13 +1,14 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 from .field import ThumborField
 from .field import ThumborData
+
+class ThumborImageField: pass
+class ThumborImageInput: pass
 
 THUMBOR_FORMATTERS = dict()
 
 try:
-    from flask             import current_app
-    from wtforms.widgets   import HTMLString, html_params
+    from flask             import Markup,current_app
+    from wtforms.widgets   import HTMLString, FileInput, html_params
     from jinja2            import Markup
     from libthumbor.crypto import CryptoURL
 
@@ -15,50 +16,50 @@ try:
     from flask_admin.contrib.mongoengine.typefmt import DEFAULT_FORMATTERS
     from werkzeug.datastructures                 import FileStorage
 
-    class ThumborImageInput(object):
+    class ThumborImageInput(FileInput):
         """
         Renders a file input chooser field.
         """
-        template = ("""
-        <div class="%(name)s-thumbnail">
-            <img src="%(thumb)s" />
-            <span><input type="checkbox" name="%(marker)s">&nbsp;Удалить</span>
-            <a href="#" onclick="cancelFile($('#%(name)s'), '%(thumb)s')" style="display:none">Отменить загрузку</a>
+        template = Markup("""<div class="%(name)s-thumbnail"><img src="%(thumb)s" />
+        <span><input type="checkbox" name="%(marker)s">&nbsp;Удалить</span>
+        <a href="#" onclick="cancelFile($('#%(name)s'), '%(thumb)s')" style="display:none">Отменить загрузку</a>
         </div>""")
 
+        placeholder = Markup("""<div class="%(name)s-thumbnail"><img />
+        <a href="#" onclick="cancelFile($('#%(name)s'), '')" style="display:none">Отменить загрузку</a>
+        </div>""")
+
+        def render(self, field, **kwargs):
+            template  = self.template if field.object_data else self.placeholder
+            arguments = { 'name' : field.name }
+
+            if field.object_data:
+                arguments.update({
+                    'thumb': field.get_image(width=80, height=64),
+                    'marker': '_{0}-delete'.format(field.name),
+                })
+
+            kwargs.setdefault('id', field.id)
+            klass       = kwargs.pop('class')
+            placeholder = template % arguments
+
+            return HTMLString('{0}<input {1} onchange="previewFile(this)">'.format(
+                placeholder,
+                html_params(name=field.name, type='file', **kwargs))
+            )
+
         def __call__(self, field, **kwargs):
-            # """
-            # Renders form widget.
-            # """
-            # kwargs.setdefault('id', field.id)
-            # placeholder = """
-            # <div class="{0}-thumbnail">
-            #     <img /><a href="#" onclick="cancelFile($('#{0}'), '')" style="display:none">Отменить загрузку</a>
-            # </div>""".format(field.name)
-            #
-            # if field.object_data:
-            #     placeholder = self.template % {
-            #         'thumb': field.get_image(width=80, height=64),
-            #         'marker': '_{0}-delete'.format(field.name),
-            #         'name': field.name
-            #     }
-            #
-            # if 'class' in kwargs.keys():
-            #     del kwargs['class']
-            #
-            # return HTMLString('{0}<input {1} onchange="previewFile(this)">'.format(
-            #     placeholder,
-            #     html_params(name=field.name, type='file', **kwargs))
-            # )
-            return HTMLString('')
+            if isinstance(field, ThumborImageField):
+                return self.render(field, **kwargs)
+            return ''
 
     class ThumborImageField(MongoFileField):
+        """
+        Manipulates data through Thumbor REST API.
+        """
         widget = ThumborImageInput()
 
         def populate_obj(self, obj, name):
-            """
-            Manipulates data through Thumbor REST API.
-            """
             field  = getattr(obj, name, None)
             upload = isinstance(self.data, FileStorage) and not is_empty(self.data.stream)
             delete = (self._should_delete or upload) and field is not None
@@ -88,21 +89,12 @@ try:
         if not value:
             return ''
 
-        return Markup(
-            ('<div class="image-thumbnail">' +
-                '<a href="%(url)s" target="_blank"><img src="%(thumb)s"/></a>' +
-             '</div>') %
-            {
-                'url': str(value),
-                'thumb': value.image(height=80, width=64),
-            })
+        template  = ("""<div class="image-thumbnail"><a href="%(url)s" target="_blank"><img src="%(thumb)s"/></a></div>""")
+        arguments = { 'url': str(value), 'thumb': value.image(height=80, width=64) }
+        return Markup(template % arguments)
 
     THUMBOR_FORMATTERS.update(DEFAULT_FORMATTERS)
     THUMBOR_FORMATTERS.update({ThumborData: thumbor_image_formatter})
 
 except ImportError:
-    class ThumborImageInput(object):
-        pass
-
-    class ThumborImageField(object):
-        pass
+    pass
