@@ -90,7 +90,7 @@ try:
             return ''
 
         template  = ("""<div class="image-thumbnail"><a href="%(url)s" target="_blank"><img src="%(thumb)s"/></a></div>""")
-        arguments = { 'url': str(value), 'thumb': value.image(height=80, width=64) }
+        arguments = { 'url': value.endpoint(), 'thumb': value.image(height=80, width=64) }
         return Markup(template % arguments)
 
     THUMBOR_FORMATTERS.update(DEFAULT_FORMATTERS)

@@ -34,10 +34,13 @@ class ThumborData(str):
                 return _url
         return ''
 
-    def __repr__(self):
+    def endpoint(self):
         with current_app.app_context():
             return urljoin(current_app.config['THUMBOR_HOST'], self)
         return ''
+
+    def __repr__(self):
+        return self.endpoint()
 
 class ThumborField(BaseField):
     def validate(self, value):
