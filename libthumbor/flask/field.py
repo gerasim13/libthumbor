@@ -3,7 +3,6 @@ from urllib.parse            import urlparse, urljoin
 from flask                   import current_app
 from mongoengine.base        import BaseField
 from libthumbor.crypto       import CryptoURL
-from flask.ext.mongoengine   import *
 from mongoengine             import *
 
 import requests
