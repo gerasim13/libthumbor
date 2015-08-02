@@ -71,4 +71,3 @@ class CryptoURL(object):
             if is_old:
                 return self.generate_old(options)
             return self.generate_new(options)
-
