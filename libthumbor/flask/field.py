@@ -1,52 +1,51 @@
-from mongoengine import *
-from mongoengine.base import BaseField
-from flask.ext.mongoengine import *
-from flask import current_app
-from urllib.parse import urlparse, urljoin
-from libthumbor.crypto import CryptoURL
+from werkzeug.datastructures import FileStorage
+from urllib.parse            import urlparse, urljoin
+from flask                   import current_app
+from mongoengine.base        import BaseField
+from libthumbor.crypto       import CryptoURL
+from mongoengine             import *
+
+import requests
 
 crypto_url = None
 
-class ThumborData(dict):
-    """
-    A dictionary with a string (absolute URL) representation.
-    """
-    def __init__(self, **kwargs):
-        self.update(kwargs)
-
-    def __repr__(self):
+class ThumborData(str):
+    def __new__(self, content = None, data = None):
         with current_app.app_context():
-            if 'path' in self.keys():
-                return urljoin(current_app.config['THUMBOR_IMAGE_ENDPOINT'], self['path'])
-        return ''
+            if isinstance(data, FileStorage):
+                files    = { 'media': data }
+                response = requests.post(current_app.config['THUMBOR_IMAGE_ENDPOINT'], files=files)
+                content  = response.headers['location']
+        return str.__new__(self, content)
 
-    def __str__(self):
-        return self.__repr__()
+    def delete(self, **kwargs):
+        with current_app.app_context():
+            url = urljoin(current_app.config['THUMBOR_IMAGE_ENDPOINT'], self)
+            requests.delete(url)
 
-    def get_image(self, **kwargs):
+    def image(self, **kwargs):
         with current_app.app_context():
             global crypto_url
             if crypto_url == None:
                 crypto_url = CryptoURL(key=current_app.config['THUMBOR_SECURITY_KEY'])
-            if 'path' in self.keys():
-                _url = urljoin('{u.scheme}://{u.netloc}'.format(u=urlparse(current_app.config['THUMBOR_IMAGE_ENDPOINT'])), crypto_url.generate(image_url='/'.join(self['path'].split('/')[2:]), **kwargs))
+            if len(self) > 0:
+                _url = urljoin('{u.scheme}://{u.netloc}'.format(u=urlparse(current_app.config['THUMBOR_HOST'])), crypto_url.generate(image_url='/'.join(self.split('/')[2:]), **kwargs))
                 return _url
         return ''
 
+    def endpoint(self):
+        with current_app.app_context():
+            return urljoin(current_app.config['THUMBOR_HOST'], self)
+        return ''
+
+    def __repr__(self):
+        return self.endpoint()
+
 class ThumborField(BaseField):
     def validate(self, value):
-        if isinstance(value, str) or (value is None):
+        if not isinstance(value, (type(None), ThumborData, str, list)):
             self.error('{0} is not a valid Thumbor data'.format(value))
         return
 
     def to_python(self, value):
-        value_dict = None
-        if 'path' in value:
-            temp_val = value['path']
-            if 'path' in temp_val:
-                value_dict = {'path': value['path']['path']}
-            else:
-                value_dict = {'path': value['path']}
-        else:
-            value_dict = {'path': value}
-        return ThumborData(**value_dict)
+        return ThumborData(value)

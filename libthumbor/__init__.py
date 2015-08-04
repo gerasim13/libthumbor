@@ -13,3 +13,8 @@
 __version__ = "1.1.0"
 
 from libthumbor.crypto import CryptoURL
+
+__all__ = [
+    'crypto',
+    'flask',
+]

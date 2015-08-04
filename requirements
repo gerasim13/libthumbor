@@ -11,3 +11,4 @@ libvpx-dev
 libwebp-dev
 webp
 gifsicle
+requests
