@@ -38,6 +38,9 @@ class ThumborData(str):
             return urljoin(current_app.config['THUMBOR_HOST'], self)
         return ''
 
+    def __str__(self):
+        return self.endpoint()
+
     def __repr__(self):
         return self.endpoint()
 
