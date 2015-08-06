@@ -10,13 +10,13 @@ import requests
 crypto_url = None
 
 class ThumborData(str):
-    def __new__(self, content = None, data = None):
+    def __new__(self, path = None, data = None):
         with current_app.app_context():
             if isinstance(data, FileStorage):
                 files    = { 'media': data }
                 response = requests.post(current_app.config['THUMBOR_IMAGE_ENDPOINT'], files=files)
-                content  = response.headers['location']
-        return str.__new__(self, content)
+                path     = response.headers['location']
+        return str.__new__(self, path)
 
     def delete(self, **kwargs):
         with current_app.app_context():
@@ -28,18 +28,15 @@ class ThumborData(str):
             global crypto_url
             if crypto_url == None:
                 crypto_url = CryptoURL(key=current_app.config['THUMBOR_SECURITY_KEY'])
-            if len(self) > 0:
+            if self and len(self) > 0:
                 _url = urljoin('{u.scheme}://{u.netloc}'.format(u=urlparse(current_app.config['THUMBOR_HOST'])), crypto_url.generate(image_url='/'.join(self.split('/')[2:]), **kwargs))
                 return _url
         return ''
 
     def endpoint(self):
         with current_app.app_context():
-            return urljoin(current_app.config['THUMBOR_HOST'], self)
+            return urljoin(current_app.config['THUMBOR_HOST'], self) if self else ''
         return ''
-
-    def __str__(self):
-        return self.endpoint()
 
     def __repr__(self):
         return self.endpoint()
