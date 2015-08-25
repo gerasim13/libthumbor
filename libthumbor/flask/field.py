@@ -29,7 +29,7 @@ class ThumborData(str):
             if crypto_url == None:
                 crypto_url = CryptoURL(key=current_app.config['THUMBOR_SECURITY_KEY'])
             if self and len(self) > 0:
-                _img = self.endpoint().replace('http://','') if 'smart' in kwargs else '/'.join(self.split('/')[2:])
+                _img = '/'.join(self.split('/')[2:])
                 _url = urlparse(current_app.config['THUMBOR_HOST'])
                 _url = '{u.scheme}://{u.netloc}'.format(u=_url)
                 _img = crypto_url.generate(image_url=_img, **kwargs)
