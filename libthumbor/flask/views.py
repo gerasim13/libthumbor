@@ -40,7 +40,7 @@ try:
                 })
 
             kwargs.setdefault('id', field.id)
-            klass       = kwargs.pop('class')
+            klass       = kwargs.pop('class', '')
             placeholder = template % arguments
 
             return HTMLString('{0}<input {1} onchange="previewFile(this)">'.format(
