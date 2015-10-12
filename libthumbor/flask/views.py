@@ -20,36 +20,36 @@ try:
         """
         Renders a file input chooser field.
         """
-        template = Markup("""<div class="media %(name)s-thumbnail">
-            <a class="pull-left" href="#"><img class="media-object" src="%(thumb)s"/></a>
-            <div class="media-body">
-                <a class="media-heading" href="#" onclick="cancelFile($('#%(name)s'), '%(thumb)s')" style="display:none">Отменить загрузку</a>
-                <div class="checkbox" name="delete" checked="checked">
-                  <label><input type="checkbox" name="%(marker)s">Удалить</label>
-                </div>
+        template = Markup("""<a class="pull-left" href="#"><img class="media-object" src="%(thumb)s"/></a>
+            <div class="media-heading">
+                <a href="#" onclick="cancelFile($('#%(name)s'), '%(thumb)s')" style="display:none">Отменить загрузку</a>
+                <div class="checkbox" name="delete" checked="checked"><label><input type="checkbox" name="%(marker)s">Удалить</label></div>
             </div>
-        </div>""")
+            """)
 
-        placeholder = Markup("""<div class="media %(name)s-thumbnail">
-            <a class="pull-left" href="#"><input %(params)s onchange="previewFile(this)"></a>
-            <div class="media-body">
-                <a class="media-heading" href="#" onclick="cancelFile($('#%(name)s'), '')" style="display:none">Отменить загрузку</a>
-            </div>
-        </div>""")
+        placeholder = Markup("""<a class="pull-left" href="#"><img /></a>
+            <div class="media-heading"><a href="#" onclick="cancelFile($('#%(name)s'), '')" style="display:none">Отменить загрузку</a></div>
+            """)
 
         def render(self, field, **kwargs):
-            arguments = { 'name' : field.name, 'params': html_params(name=field.name, type='file', **kwargs) }
             template  = self.template if field.object_data else self.placeholder
-            klass     = kwargs.pop('class', '')
+            arguments = { 'name' : field.name }
 
             if field.object_data:
                 arguments.update({
-                    'marker': '_{0}-delete'.format(field.name),
                     'thumb': field.get_image(width=80, height=64),
+                    'marker': '_{0}-delete'.format(field.name),
                 })
 
             kwargs.setdefault('id', field.id)
-            return HTMLString(template % arguments)
+            klass       = kwargs.pop('class', '')
+            placeholder = template % arguments
+
+            return HTMLString('<div class="media {0}-thumbnail">{1}<div class="media-body"><input {2} onchange="previewFile(this)"></div></div>'.format(
+                field.name,
+                placeholder,
+                html_params(name=field.name, type='file', **kwargs))
+            )
 
         def __call__(self, field, **kwargs):
             if isinstance(field, ThumborImageField):
